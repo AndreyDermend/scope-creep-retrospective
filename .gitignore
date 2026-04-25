@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Testing
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+
+# Secrets
+.env
+.env.local
+*.secret
+
+# Generated artifacts (not committed — this is state, not source)
+training.csv
+scoring.csv
+prediction.csv
+presentation.pptx
+transcripts/
+docs/report.html
+
+# Data cache
+data/*.csv
+!data/README.md
