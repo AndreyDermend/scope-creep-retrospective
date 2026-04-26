@@ -71,18 +71,33 @@ make install-dev
 # Set your key (or put it in .env — see .env.example)
 export OPENAI_API_KEY=sk-...
 
-# Run the pipeline — three agents launch in parallel, UI renders live
-make run
+# Live web dashboard (recommended for the demo) ────────────────────
+make web
+# → opens a FastAPI server on http://localhost:8000
+# → open that URL in your browser; agent events stream in via SSE
+# → three color-coded lanes, live as the agents work
 
-# Open the HTML report in a browser
-open docs/report.html   # macOS — use `xdg-open` on Linux
+# OR — terminal UI (if you prefer the Rich version) ────────────────
+make run
 ```
 
 Expected artifacts after a run:
 - `prediction.csv` — Andrey's model's predictions on the held-out scoring set
 - `presentation.pptx` — Dimitar's lessons-learned deck (QA-validated)
 - `transcripts/*.json` — full per-agent conversation logs
-- `docs/report.html` — browser-viewable run summary
+- `docs/report.html` — static HTML summary (regenerate anytime with `make report`)
+
+## The web dashboard
+
+Three side-by-side lanes — Dr. Hong (eucalyptus), Andrey (amber), Dimitar (twilight purple) — with a terminal/control-room aesthetic. Each event streams in as a colored bullet with timestamp and event kind. The **phase indicator** under each agent's name updates in real time so you can see them transition: scope → review → execute → brief.
+
+Built on Server-Sent Events (no WebSocket complexity — browser auto-reconnects on drop, replays buffered events for late-joining clients). The agents emit `UIEvent`s into a shared `mp.Queue`; the FastAPI server drains it and re-emits to the browser. Connection state is visible in the footer.
+
+Custom `--host` / `--port`:
+
+```bash
+python -m scope_creep.main --ui web --port 9000
+```
 
 ## Development
 
@@ -100,7 +115,8 @@ make test        # just the tests
 make test-cov    # tests + coverage report
 make lint        # ruff check
 make format      # ruff format + auto-fix
-make run         # the actual pipeline
+make web         # ▶ live web dashboard on http://localhost:8000
+make run         # ▶ terminal UI version
 make report      # regenerate docs/report.html from saved transcripts
 make clean       # wipe artifacts
 ```
@@ -132,17 +148,24 @@ scope-creep-retrospective/
 │   ├── ui/
 │   │   ├── live.py              ← Rich live terminal UI
 │   │   └── report.py            ← HTML report generator
+│   ├── web/                     ← FastAPI + SSE live dashboard
+│   │   ├── server.py            ← /events SSE endpoint, /api/state
+│   │   └── static/
+│   │       ├── index.html       ← three-lane control room
+│   │       ├── style.css        ← dark terminal aesthetic
+│   │       └── app.js           ← EventSource consumer
 │   └── utils/
 │       ├── code_extract.py      ← pull Python out of LLM responses
 │       └── transcript.py        ← UIEvent + Transcript dataclasses
-└── tests/                       ← 33 tests, runs in ~13s
+└── tests/                       ← 39 tests, runs in ~19s
     ├── test_code_extract.py
     ├── test_coder_integration.py (mocked OpenAI)
     ├── test_full_pipeline.py    (end-to-end, mocked LLMs)
     ├── test_qa.py               (real .pptx files)
     ├── test_report.py
     ├── test_roles.py
-    └── test_transcript.py
+    ├── test_transcript.py
+    └── test_web_server.py       (FastAPI TestClient)
 ```
 
 ## Design choices worth calling out

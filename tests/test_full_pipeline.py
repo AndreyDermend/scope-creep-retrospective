@@ -171,8 +171,10 @@ def test_full_pipeline_smoke(tmp_path, monkeypatch):
         system_prompt=DR_HONG.system_prompt,
         inbox=lead_in,
         ui_queue=None,
-        coder=coder,
-        scrum_master=scrum,
+        coder_inbox=coder_in,
+        scrum_inbox=scrum_in,
+        coder_name=ANDREY.name,
+        scrum_name=DIMITAR.name,
         scope_document=SCOPE_DOCUMENT,
     )
 

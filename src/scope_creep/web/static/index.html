@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>scope-creep · control room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="scanlines"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">◐</span>
+    <span class="brand-name">scope-creep</span>
+    <span class="brand-sub">retrospective · control room</span>
+  </div>
+  <div class="status">
+    <span class="status-item">
+      <span class="status-label">elapsed</span>
+      <span class="status-value" id="elapsed">00:00</span>
+    </span>
+    <span class="status-item">
+      <span class="status-label">events</span>
+      <span class="status-value" id="event-count">0</span>
+    </span>
+    <span class="status-item">
+      <span class="status-label">state</span>
+      <span class="status-value status-pill" id="run-state">connecting</span>
+    </span>
+  </div>
+</header>
+
+<main class="board">
+  <section class="lane" id="lane-hong" data-agent="Dr. Hong">
+    <div class="lane-header">
+      <div class="lane-title">
+        <span class="lane-id">01</span>
+        <span class="lane-name">Dr. Hong</span>
+      </div>
+      <div class="lane-role">team lead · scope discipline</div>
+      <div class="lane-phase" id="phase-Dr. Hong">idle</div>
+    </div>
+    <div class="lane-events" id="events-Dr. Hong"></div>
+  </section>
+
+  <section class="lane" id="lane-andrey" data-agent="Andrey">
+    <div class="lane-header">
+      <div class="lane-title">
+        <span class="lane-id">02</span>
+        <span class="lane-name">Andrey</span>
+      </div>
+      <div class="lane-role">coder · over-delivers on principle</div>
+      <div class="lane-phase" id="phase-Andrey">idle</div>
+    </div>
+    <div class="lane-events" id="events-Andrey"></div>
+  </section>
+
+  <section class="lane" id="lane-dimitar" data-agent="Dimitar">
+    <div class="lane-header">
+      <div class="lane-title">
+        <span class="lane-id">03</span>
+        <span class="lane-name">Dimitar</span>
+      </div>
+      <div class="lane-role">scrum master · deck QA loop</div>
+      <div class="lane-phase" id="phase-Dimitar">idle</div>
+    </div>
+    <div class="lane-events" id="events-Dimitar"></div>
+  </section>
+</main>
+
+<footer class="footer">
+  <span class="footer-l">three-agent ml pipeline · gpt-4.1-mini</span>
+  <span class="footer-r" id="connection">● connecting to /events</span>
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

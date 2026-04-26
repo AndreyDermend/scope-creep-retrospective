@@ -149,7 +149,7 @@ class ScrumMaster(Agent):
             if os.path.exists(self.target_file):
                 os.remove(self.target_file)
             exec_result = subprocess.run(
-                ["python", "-c", gen_code],
+                ["python3", "-c", gen_code],
                 capture_output=True,
                 text=True,
                 timeout=60,

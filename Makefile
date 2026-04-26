@@ -1,6 +1,6 @@
-.PHONY: help install install-dev test test-cov lint format run clean report hook check
+.PHONY: help install install-dev test test-cov lint format run web clean report hook check
 
-PY := python
+PY := python3
 SRC := src/scope_creep
 TESTS := tests
 
@@ -10,9 +10,11 @@ help:  ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 install:  ## Install runtime dependencies
+	$(PY) -m pip install --upgrade pip
 	$(PY) -m pip install -r requirements.txt
 
 install-dev:  ## Install dev + runtime dependencies
+	$(PY) -m pip install --upgrade pip
 	$(PY) -m pip install -r requirements-dev.txt
 	$(PY) -m pip install -e .
 
@@ -31,8 +33,11 @@ format:  ## Auto-format with ruff
 
 check: lint test  ## Run all checks (lint + tests) — CI-equivalent
 
-run:  ## Run the full three-agent pipeline
+run:  ## Run the full three-agent pipeline (terminal UI)
 	PYTHONPATH=src $(PY) -m scope_creep.main
+
+web:  ## Run the full three-agent pipeline (web UI on http://localhost:8000)
+	PYTHONPATH=src $(PY) -m scope_creep.main --ui web
 
 report:  ## Regenerate HTML report from saved transcripts
 	PYTHONPATH=src $(PY) -m scope_creep.ui.report

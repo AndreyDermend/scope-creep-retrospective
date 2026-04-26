@@ -28,17 +28,24 @@ class TeamLead(Agent):
         name: str,
         system_prompt: str,
         inbox: mp.Queue,
-        coder: Agent,
-        scrum_master: Agent,
+        coder_inbox: mp.Queue,
+        scrum_inbox: mp.Queue,
         scope_document: str,
         ui_queue: mp.Queue | None = None,
+        coder_name: str = "Andrey",
+        scrum_name: str = "Dimitar",
         target_csv: str = "prediction.csv",
         model: str = "gpt-4.1-mini",
         temperature: float = 0.2,
     ) -> None:
         super().__init__(name, system_prompt, inbox, ui_queue, model, temperature)
-        self.coder = coder
-        self.scrum_master = scrum_master
+        # Store only mp.Queue objects — NOT mp.Process objects.
+        # On macOS (spawn start method), started Process objects cannot be
+        # pickled, which silently kills the child before it emits a single event.
+        self.coder_inbox = coder_inbox
+        self.scrum_inbox = scrum_inbox
+        self.coder_name = coder_name
+        self.scrum_name = scrum_name
         self.scope_document = scope_document
         self.target_csv = target_csv
 
@@ -52,8 +59,8 @@ class TeamLead(Agent):
         # ---------- Phase 1: send scope to Andrey ----------
         self.set_phase("scope")
         self.emit("status", "Drafted scope document — sending to Andrey")
-        self.coder.inbox.put(
-            {"content": self.scope_document, "to": self.coder.agent_name}
+        self.coder_inbox.put(
+            {"content": self.scope_document, "to": self.coder_name}
         )
         messages.append(
             {
@@ -122,7 +129,7 @@ class TeamLead(Agent):
             os.remove(self.target_csv)
 
         exec_result = subprocess.run(
-            ["python", "-c", trimmed],
+            ["python3", "-c", trimmed],
             capture_output=True,
             text=True,
             timeout=180,
@@ -135,8 +142,8 @@ class TeamLead(Agent):
                 f"Execution did not produce {self.target_csv}. "
                 f"stderr: {exec_result.stderr[:400]}",
             )
-            if self.scrum_master is not None:
-                self.scrum_master.inbox.put({"content": Agent.task_done()})
+            if self.scrum_inbox is not None:
+                self.scrum_inbox.put({"content": Agent.task_done()})
             return
 
         try:
@@ -183,8 +190,8 @@ class TeamLead(Agent):
 
         messages.append({"role": "assistant", "content": brief})
         self.emit("output", "Brief sent to Dimitar")
-        self.scrum_master.inbox.put(
-            {"content": brief, "to": self.scrum_master.agent_name}
+        self.scrum_inbox.put(
+            {"content": brief, "to": self.scrum_name}
         )
 
         # ---------- Phase 5: wait for Dimitar ----------
